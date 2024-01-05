@@ -1,4 +1,5 @@
 ﻿using CustomersApi.Datos;
+using CustomersApi.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomersApi.Controllers
@@ -7,6 +8,17 @@ namespace CustomersApi.Controllers
         [Route("api/[controller]")]
     public class CustomerController : Controller
     {
+
+        private readonly CustomerDatabaseContext _customerDatabaseContext;
+        public CustomerController(CustomerDatabaseContext customerDatabaseContext) 
+        {
+        
+            _customerDatabaseContext = customerDatabaseContext;
+
+        }
+
+
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CustomerDto))]
         public async Task<IActionResult> GetCustomers(long id)
@@ -33,11 +45,12 @@ namespace CustomersApi.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CustomerDto))]
         public async Task<IActionResult> CreateCustomer(CreateCustomerDto customer)
         {
-            var vacio = new CustomerDto();
+            CustomerEntity result = await _customerDatabaseContext.Add(customer);
 
-            return new CreatedResult($"https://localhost:7075/api/customer/{vacio.id}", null);
+            return new CreatedResult($"https://localhost:7075/api/customer/{result.Id}", null);
         }
 
 
